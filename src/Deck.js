@@ -5,6 +5,7 @@ class Deck extends Component {
   constructor(props) {
     super(props);
 
+    const position = new Animated.ValueXY();
     const panResponder = PanResponder.create({
       // boolean to determine if PanResponder is active on a screen press
       onStartShouldSetPanResponder: () => true,
@@ -13,13 +14,14 @@ class Deck extends Component {
       // always takes an event, is an object with info on what was pressed
       // second arg is gesture, has info on what info is doing with finger on screen
       onPanResponderMove: (event, gesture) => {
+        position.setValue({ x: gesture.dx, y: gesture.dy });
       },
 
       // the function on the screen press release
       onPanResponderRelease: () => {}
     });
 
-    this.state = { panResponder };
+    this.state = { panResponder, position };
   }
 
   renderCards() {
@@ -30,9 +32,12 @@ class Deck extends Component {
 
   render() {
     return (
-      <View {...this.state.panResponder.panHandlers}>
+      <Animated.View
+        style={this.state.position.getLayout()}
+        {...this.state.panResponder.panHandlers}
+      >
         {this.renderCards()}
-      </View>
+      </Animated.View>
     );
   }
 }

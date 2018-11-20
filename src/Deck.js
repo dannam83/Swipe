@@ -50,6 +50,12 @@ class Deck extends Component {
     this.state = { panResponder, position, currentIndex: 0 };
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.data !== this.props.data) {
+      this.setState({ currentIndex: 0 });
+    }
+  }
+
   componentWillUpdate() {
     UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
     LayoutAnimation.spring();

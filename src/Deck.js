@@ -99,7 +99,10 @@ class Deck extends Component {
         );
       }
       return (
-        <Animated.View key={item.id} style={styles.cardStyle}>
+        <Animated.View
+          key={item.id}
+          style={[styles.cardStyle, { top: 10 * (index - this.state.currentIndex) }]}
+        >
           {this.props.renderCard(item)}
         </Animated.View>
       );

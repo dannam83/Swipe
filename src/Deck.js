@@ -20,7 +20,9 @@ class Deck extends Component {
       },
 
       // the function on the screen press release
-      onPanResponderRelease: () => {}
+      onPanResponderRelease: () => {
+        this.resetPosition();
+      }
     });
 
     this.state = { panResponder, position };
@@ -37,6 +39,12 @@ class Deck extends Component {
       ...position.getLayout(),
       transform: [{ rotate }]
     };
+  }
+
+  resetPosition() {
+    Animated.spring(this.state.position, {
+      toValue: { x: 0, y: 0 }
+    }).start();
   }
 
   renderCards() {

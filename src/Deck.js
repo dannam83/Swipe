@@ -4,6 +4,8 @@ import { View, Animated, PanResponder, Dimensions } from 'react-native';
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SWIPE_THRESHOLD = 0.25 * SCREEN_WIDTH;
 const SWIPE_OUT_DURATION = 250;
+const RIGHT = 'right';
+const LEFT = 'left';
 
 class Deck extends Component {
   static defaultProps = {
@@ -29,22 +31,25 @@ class Deck extends Component {
       // the function on the screen press release
       onPanResponderRelease: (event, gesture) => {
         if (gesture.dx > SWIPE_THRESHOLD) {
-          this.forceSwipe('right');
+          this.forceSwipe(RIGHT);
         } else if (gesture.dx < -SWIPE_THRESHOLD) {
-          this.forceSwipe('left');
+          this.forceSwipe(LEFT);
         } else {
           this.resetPosition();
         }
       }
     });
 
-    this.state = { panResponder, position, index: 0 };
+    this.state = { panResponder, position, currentIndex: 0 };
   }
 
   onSwipeComplete(direction) {
     const { onSwipeRight, onSwipeLeft, data } = this.props;
-    const item = data[this.state.index];
-    direction === 'right' ? onSwipeRight(item) : onSwipeLeft(item)
+    const item = data[this.state.currentIndex];
+    if (direction === RIGHT) { onSwipeRight(item); }
+    if (direction === LEFT) { onSwipeLeft(item); }
+    // this.state.position.setValue({ x: 0, y: 0 });
+    this.setState({ currentIndex: this.state.currentIndex + 1 });
   }
 
   getCardStyle() {
@@ -61,11 +66,12 @@ class Deck extends Component {
   }
 
   forceSwipe(direction) {
-    const x = direction === 'right' ? SCREEN_WIDTH : -SCREEN_WIDTH;
+    const x = direction === RIGHT ? SCREEN_WIDTH : -SCREEN_WIDTH;
     Animated.timing(this.state.position, {
       toValue: { x, y: 0 },
       duration: SWIPE_OUT_DURATION
     }).start(this.onSwipeComplete(direction));
+    this.state.position.setValue({ x: 0, y: 0 });
   }
 
   resetPosition() {
@@ -76,7 +82,8 @@ class Deck extends Component {
 
   renderCards() {
     return this.props.data.map((item, index) => {
-      if (index === 0) {
+      if (index < this.state.currentIndex) { return null; }
+      if (index === this.state.currentIndex) {
         return (
           <Animated.View
             key={item.id}
